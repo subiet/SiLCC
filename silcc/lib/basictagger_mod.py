@@ -6,6 +6,12 @@ import csv
 
 import nltk
 
+from optparse import OptionParser # command-line option parser                                                                                                  
+from paste.deploy import appconfig
+from sqlalchemy import select, and_, create_engine, MetaData, Table
+from pylons import app_globals
+from silcc.config.environment import load_environment
+
 from silcc.lib.util import CIList, stop_words # , capitalization_type
 from silcc.lib.basictokenizer import BasicTokenizer
 from silcc.lib.singularizer import singularize
@@ -27,9 +33,13 @@ pos_adj = ('JJ',  'JJR')
 class BasicTagger(object):
     """BasicTagger class for tagging English text"""
 
+    def __init__(self, engine):
+        self.engine = engine
+
     @classmethod
     def tag(cls, text):
-        """Class method that returns tags given some text"""
+
+        
         if not text:
             return []
 
@@ -37,11 +47,10 @@ class BasicTagger(object):
         bt = BasicTokenizer()
         
         #Call to Capitalization Normalizer.
-        n = Normalizer()
-        #text = n.normalizer(text)
-        
-        tokens = bt.tokenize(text)
+        n = Normalizer(engine=engine)
 
+        text = n.normalizer(text)
+        tokens = bt.tokenize(text)
         pos = nltk.pos_tag(tokens)
 
         for word_ in pos:
@@ -82,6 +91,21 @@ class BasicTagger(object):
         return tags_
         
 if __name__ == '__main__':
-    text = sys.argv[1]
+    parser = OptionParser()
+    parser.add_option('--ini',
+                      help='INI file to use for application settings',
+                      type='str',
+                      default='development.ini')
+    parser.add_option('--text',
+                      help='Enter text to tag',
+                      type='str',
+                      default='This is a sample tagging text')
+    (options, args) = parser.parse_args()
+    
+    conf = appconfig('config:' + options.ini, relative_to='.')
+    load_environment(conf.global_conf, conf.local_conf)
+    
+    engine = create_engine(conf['sqlalchemy.url'], echo=False)
+    text = options.text
     tags = BasicTagger.tag(text)
     print tags

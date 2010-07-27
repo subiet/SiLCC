@@ -39,6 +39,7 @@ if __name__ == '__main__':
     engine = create_engine(conf['sqlalchemy.url'], echo=True)
     meta = MetaData()
     conn = engine.connect()
+    
     print conn
 
     co_table = sa.Table('countries', meta, autoload=True, autoload_with=engine)

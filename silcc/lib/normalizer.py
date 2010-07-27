@@ -27,7 +27,8 @@ class Normalizer(object):
 
     def __init__(self, engine):
         self.engine = engine
-        self.country_table = Table('countries', metadata, autoload=True, autoload_with=engine)
+        self.geo_table = Table('countries', metadata, autoload=True, autoload_with=engine)
+        self.acro_table = Table('acronyms', metadata, autoload=True, autoload_with=engine)
         
     
     
@@ -38,12 +39,16 @@ class Normalizer(object):
         ya_ = SentenceTokenizer.tokenize(dt_['text'])
         dt_['tokens'] = [xb_[0] for xb_ in ya_]
         result = apply_multinomial_NB(C, V, prior, condprob, dt_)[0]
+        
+        geo_table = self.geo_table
+        acro_table = self.acro_table
+        engine = self.engine
 
         # example of reading from the db
-        country_table = self.country_table
-        query = select([country_table.c.name], from_obj=[country_table])
-        for country_row in Session.execute(query):
-            print country_row
+#        country_table = self.country_table
+#        query = select([country_table.c.name], from_obj=[country_table])
+#        for country_row in Session.execute(query):
+#            print country_row
 
         #print result
         
@@ -53,7 +58,7 @@ class Normalizer(object):
         'ALLCAPS' : allcaps, 
         'SHOUT' : shout, 
         'LOWER' : lower }
-        text = switch_normalizer.get(result, other)(text, ya_)
+        text = switch_normalizer.get(result, other)(text, ya_, geo_table, acro_table)
         return text.replace(' .', '.')
     
 
@@ -75,15 +80,15 @@ def apply_multinomial_NB(C, V, prior, condprob, dt_):
     return max_cat, max_score
 
 
-def regular(text, ya_):
+def regular(text, ya_,  geo_table, acro_table):
     '''Convert from Regular to Regular'''
     return text
     
-def german(text, ya_):
+def german(text, ya_, geo_table, acro_table):
     '''Convert from German to German'''
     return text
     
-def allcaps(text, ya_):
+def allcaps(text, ya_, geo_table, acro_table):
     '''Convert from AllCaps to Regular'''
     ab_ = []
     for i, xb_ in enumerate(ya_):
@@ -98,8 +103,9 @@ def allcaps(text, ya_):
     text = ' '.join(ab_)
     return text
     
-def shout(text, ya_):
+def shout(text, ya_, geo_table, acro_table):
     '''Convert from shout to Regular'''
+    conn = engine.connect()
     text = text.lower()
     ab_ = []
     for i, xb_ in enumerate(ya_):
@@ -107,63 +113,64 @@ def shout(text, ya_):
         #Add Cap Type Specific Rules
         if (xb_[0] != 'ACRONYM'):
             ab_[i] = ab_[i].lower()
-#        if (xb_[0] == 'FIRST_SHOUT_STOPWORD' or xb_[0] == 'FIRST_SHOUT'):
-#            ab_[i] = ab_[i].capitalize()
+        if (xb_[0] == 'FIRST_SHOUT_STOPWORD' or xb_[0] == 'FIRST_SHOUT'):
+            ab_[i] = ab_[i].capitalize()
 
         
-#        #Query Places Database, if present then convert to Capitalize
-#        sel = select([geo_table.c.name],  geo_table.c.name == xb_[1])    
-#        result = conn.execute(sel)
-#        j=0
-#        for row in result:
-#            j+=1
-#        if j > 0:
-#            ab_[i] = ab_[i].capitalize()
-#                
-#        
-#        #Query Acronmys Database, if present then convert to shout
-#        sel = select([acro_table.c.name],  acro_table.c.name== xb_[1])   
-#        result = conn.execute(sel)
-#        j=0
-#        for row in result:
-#           j+=1
-#        if j > 0:
-#            ab_[i] = ab_[i].upper()
+        #Query Places Database, if present then convert to Capitalize
+        sel = select([geo_table.c.name],  geo_table.c.name == xb_[1])    
+        result = conn.execute(sel)
+        j=0
+        for row in result:
+            j+=1
+        if j > 0:
+            ab_[i] = ab_[i].capitalize()
+                
+        
+        #Query Acronmys Database, if present then convert to shout
+        sel = select([acro_table.c.name],  acro_table.c.name== xb_[1])   
+        result = conn.execute(sel)
+        j=0
+        for row in result:
+           j+=1
+        if j > 0:
+            ab_[i] = ab_[i].upper()
         
         #End of Rules
         
     text = ' '.join(ab_)
     return text
     
-def lower(text, ya_):
+def lower(text, ya_, geo_table, acro_table):
     '''Convert from lower to Regular'''
+    conn = engine.connect()
     ab_ = []
     for i, xb_ in enumerate(ya_):
         ab_.append(xb_[1])
         #Add Cap Type Specific Rules
-#        if (xb_[0] == 'FIRST_LOWER_STOPWORD' or xb_[0] == 'FIRST_LOWER'):
-#            ab_[i] = ab_[i].capitalize()
+        if (xb_[0] == 'FIRST_LOWER_STOPWORD' or xb_[0] == 'FIRST_LOWER'):
+            ab_[i] = ab_[i].capitalize()
         if (xb_[0] == 'ACRONYM'):
             ab_[i] = ab_[i].upper()
 
-#        #Query Places Database, if present then convert to Capitalize
-#        sel = select([geo_table.c.name],  geo_table.c.name == xb_[1])    
-#        result = conn.execute(sel)
-#        j=0
-#        for row in result:
-#            j+=1
-#        if j > 0:
-#            ab_[i] = ab_[i].capitalize()
-#                
-#        
-#        #Query Acronmys Database, if present then convert to shout
-#        sel = select([acro_table.c.name],  acro_table.c.name== xb_[1])   
-#        result = conn.execute(sel)
-#        j=0
-#        for row in result:
-#           j+=1
-#        if j > 0:
-#            ab_[i] = ab_[i].upper()
+        #Query Places Database, if present then convert to Capitalize
+        sel = select([geo_table.c.name],  geo_table.c.name == xb_[1])    
+        result = conn.execute(sel)
+        j=0
+        for row in result:
+            j+=1
+        if j > 0:
+            ab_[i] = ab_[i].capitalize()
+                
+        
+        #Query Acronmys Database, if present then convert to shout
+        sel = select([acro_table.c.name],  acro_table.c.name== xb_[1])   
+        result = conn.execute(sel)
+        j=0
+        for row in result:
+           j+=1
+        if j > 0:
+            ab_[i] = ab_[i].upper()
         
         #End of Rules
         
@@ -171,7 +178,7 @@ def lower(text, ya_):
     text = ' '.join(ab_)
     return text
 
-def other(text, ya_):
+def other(text, ya_, geo_table, acro_table):
     '''Leave as it is'''
     return text
 
@@ -181,11 +188,17 @@ if __name__ == '__main__':
                       help='INI file to use for application settings',
                       type='str',
                       default='development.ini')
+    parser.add_option('--text',
+                      help='Enter text to tag',
+                      type='str',
+                      default='This is a sample tagging text')
     (options, args) = parser.parse_args()
-    conf = appconfig('config:' + 'prod.ini', relative_to='.')
+    
+    conf = appconfig('config:' + options.ini, relative_to='.')
     load_environment(conf.global_conf, conf.local_conf)
     engine = create_engine(conf['sqlalchemy.url'], echo=False)
-    text = args[0]
+    
+    text = options.text
     N = Normalizer(engine=engine)
     print N.normalizer(text)
 
