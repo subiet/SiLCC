@@ -42,12 +42,11 @@ class BasicTagger(object):
         if not text:
             return []
         
-        print engine 
-        
+      
         text = text.replace("'", "")
-        
-        #Call to Capitalization Normalizer
         bt = BasicTokenizer()
+        #Call to Capitalization Normalizer
+       
         n = Normalizer(engine=engine)
         
         text = n.normalizer(text)

@@ -1,5 +1,8 @@
+"""Loads the database for use with TagGenerator"""
 import sys
 import feedparser
+import json
+import urllib.request, urllib.parse
 
 from optparse import OptionParser # command-line option parser                                                                                                  
 from paste.deploy import appconfig
@@ -28,6 +31,16 @@ class FeedParser(object):
 #            print item.title
         
         T.tag('Test Tag')
+        
+    def googleres(self,  tag):
+        query = urllib.parse.urlencode({'q': searchfor})
+        url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&%s' % query
+        search_response = urllib.request.urlopen(url)
+        search_results = search_response.read().decode("utf8")
+        results = json.loads(search_results)
+        data = results['responseData']
+        print('Total results: %s' % data['cursor']['estimatedResultCount'])
+
 
 
 if __name__ == '__main__':

@@ -1,8 +1,6 @@
-"""Creates the Database used by the SilCC Api"""
+"""Loads the Country Names table for use in Normalizer"""
 from optparse import OptionParser # command-line option parser                                                                                                  
-from pprint import pprint       
 
-import logging
 import traceback
 import sys
 import time
@@ -12,16 +10,12 @@ import csv
 from paste.deploy import appconfig
 from pylons import app_globals
 from silcc.config.environment import load_environment
-#from silcc.model import tables as t
-#from silcc.model.meta import Session
+from sqlalchemy import create_engine, MetaData,  Table
 
-#from silcc.model import meta as meta
-#from silcc.model import tables
-from sqlalchemy import select, and_, create_engine, MetaData,  Table, Column, Integer, String, ForeignKey
 import sqlalchemy as sa
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     parser = OptionParser()
     parser.add_option('--ini',
                       help='INI file to use for application settings',
@@ -35,13 +29,10 @@ if __name__ == '__main__':
 
     conf = appconfig('config:' + options.ini, relative_to='.')
     load_environment(conf.global_conf, conf.local_conf)
-    
     engine = create_engine(conf['sqlalchemy.url'], echo=True)
     meta = MetaData()
     conn = engine.connect()
     
-    print conn
-
     co_table = sa.Table('countries', meta, autoload=True, autoload_with=engine)
     fh = open(options.filename)
     line = fh.readline()
