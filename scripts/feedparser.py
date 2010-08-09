@@ -11,6 +11,7 @@ from sqlalchemy import select, and_, create_engine, MetaData, Table
 from silcc.model.meta import metadata, Session
 from silcc.config.environment import load_environment
 from silcc.lib.basictagger import BasicTagger
+from silcc.lib.goog import ser
 
 class FeedParser(object):
     """Normalizer class for which instance should be created"""
