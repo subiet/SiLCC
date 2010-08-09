@@ -11,7 +11,7 @@ from sqlalchemy import select, and_, create_engine, MetaData, Table
 from pylons import app_globals
 from silcc.config.environment import load_environment
 
-from silcc.lib.util import CIList, stop_words # , capitalization_type
+from silcc.lib.util import CIList, stop_words # capitalization_type
 from silcc.lib.basictokenizer import BasicTokenizer
 from silcc.lib.singularizer import singularize
 from silcc.lib.normalizer import Normalizer
