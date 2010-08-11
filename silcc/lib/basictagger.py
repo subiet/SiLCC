@@ -47,7 +47,7 @@ class BasicTagger(object):
         bt = BasicTokenizer()
         #Call to Capitalization Normalizer
        
-        n = Normalizer(engine=engine)
+        n = Normalizer(engine = engine)
         
         text = n.normalizer(text)
         tokens = bt.tokenize(text)
