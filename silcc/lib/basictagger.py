@@ -35,8 +35,8 @@ class BasicTagger(object):
         self.engine = engine
         
 
-    @classmethod
-    def tag(cls, text):
+    
+    def tag(self, text):
 
         """Class method that returns tags given some text"""
         if not text:
@@ -46,7 +46,7 @@ class BasicTagger(object):
         text = text.replace("'", "")
         bt = BasicTokenizer()
         #Call to Capitalization Normalizer
-       
+        engine = self.engine
         n = Normalizer(engine = engine)
         
         text = n.normalizer(text)
@@ -95,5 +95,6 @@ if __name__ == '__main__':
     engine = create_engine(conf['sqlalchemy.url'], echo=False)
 
     text = options.text
-    tags = BasicTagger.tag(text)
+    basict = BasicTagger(engine = engine)
+    tags = basict.tag(text)
     print tags
