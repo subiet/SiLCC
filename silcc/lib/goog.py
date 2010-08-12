@@ -16,4 +16,4 @@ def ser(query_):
 
 if __name__ == '__main__':
     text = sys.argv[1]
-    showsome(text)
+    ser(text)

@@ -26,7 +26,8 @@ log = logging.getLogger(__name__)
 # VBD - verb 
 
 pos_include = ('NN', 'NNP', 'NNS')
-
+class BasicTaggerException(Exception):
+    pass
                  
 class BasicTagger(object):
     """BasicTagger class for tagging English text"""
