@@ -18,7 +18,8 @@ tag_assoc_table = Table('tag_assoc', metadata,
     Column('id', mysql.MSBigInteger(unsigned=True), autoincrement=True, primary_key=True, nullable=False),
     Column('tag_one_id', mysql.MSBigInteger(unsigned=True), nullable=False, index=True),
     Column('tag_two_id', mysql.MSBigInteger(unsigned=True), nullable=False, index=True),
-    Column('score', mysql.MSInteger(unsigned=False), nullable=False)                                                 
+    Column('score', mysql.MSInteger(unsigned=False), nullable=False), 
+    Column('s_no', mysql.MSBigInteger(unsigned=False), nullable=False)
 )
 
 def upgrade():

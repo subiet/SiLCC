@@ -11,7 +11,7 @@ from sqlalchemy import select, and_, create_engine, MetaData, Table
 from pylons import app_globals
 from silcc.config.environment import load_environment
 
-from silcc.lib.util import CIList, stop_words # , capitalization_type
+from silcc.lib.util import CIList, stop_words # capitalization_type
 from silcc.lib.basictokenizer import BasicTokenizer
 from silcc.lib.singularizer import singularize
 from silcc.lib.normalizer import Normalizer
@@ -28,7 +28,8 @@ log = logging.getLogger(__name__)
 pos_include = ('NN', 'NNP', 'NNS')
 #Specific to Mod
 pos_adj = ('JJ',  'JJR')
-
+class BasicTaggerException(Exception):
+    pass
                  
 class BasicTagger(object):
     """BasicTagger class for tagging English text"""
@@ -37,8 +38,8 @@ class BasicTagger(object):
         self.engine = engine
         
 
-    @classmethod
-    def tag(cls, text):
+    
+    def tag(self, text):
 
         """Class method that returns tags given some text"""
         if not text:
@@ -48,13 +49,17 @@ class BasicTagger(object):
         text = text.replace("'", "")
         bt = BasicTokenizer()
         #Call to Capitalization Normalizer
-       
-        n = Normalizer(engine=engine)
+        engine = self.engine
+        n = Normalizer(engine = engine)
         
         text = n.normalizer(text)
         tokens = bt.tokenize(text)
         pos = nltk.pos_tag(tokens)
         
+        
+        # Only return those tokens whose pos is in the include list
+        tags = [t[0] for t in pos if t[1] in pos_include]
+
 #Mod Code Start
 
         tags = []
@@ -71,7 +76,6 @@ class BasicTagger(object):
 
         # Now exclude stopwords...
         tags = [t for t in tags if not t in stop_words]
-
         
         # Call Singularize
         tags = [singularize(t) for t in tags]
@@ -108,5 +112,6 @@ if __name__ == '__main__':
     engine = create_engine(conf['sqlalchemy.url'], echo=False)
 
     text = options.text
-    tags = BasicTagger.tag(text)
+    basict = BasicTagger(engine = engine)
+    tags = basict.tag(text)
     print tags
