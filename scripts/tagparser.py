@@ -64,9 +64,9 @@ class TagParser(object):
                 j += 1
             if j == 0:
                 #Call to Google/Yahoo Results
-                count = 1                   #Dummy
+                #count = 1                   #Dummy
                 #count = ser(t)             #Google
-                #count = sery(t)            #Yahoo
+                count = sery(t)            #Yahoo
                 insert = tag_table.insert().values(tag = t, g_no = count)
                 conn.execute(insert)
                 #print t + " " + count
@@ -89,8 +89,8 @@ class TagParser(object):
                 assoc_id = row[tag_assoc_table.c.id]
                 j+=1          
             if j == 0:
-                #s_no_ = sery(combined)
-                s_no_ = 1
+                s_no_ = sery(combined)
+                #s_no_ = 1
                 insert_ = tag_assoc_table.insert().values(tag_one_id = tag1_id,
                                 tag_two_id = tag2_id, score = 1, s_no = s_no_)
                 conn.execute(insert_)
