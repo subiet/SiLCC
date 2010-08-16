@@ -115,7 +115,7 @@ if __name__ == '__main__':
     engine = create_engine(conf['sqlalchemy.url'], echo=False)
     basict = BasicTagger(engine = engine)
     tp = TagParser(engine = engine)
-    fcsv = open('data/training/trial.csv', "rb")
+    #fcsv = open('data/training/trial.csv', "rb")
     fcsv = open('data/training/muti_submissions.csv', "rb")
     reader = csv.reader(fcsv)
     for row in reader :
