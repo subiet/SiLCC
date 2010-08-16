@@ -1,4 +1,4 @@
-"""Given short snippet of text converts that text into REGULAR capitilization"""
+"""Given short snippet of text converts tehm into REGULAR capitilization"""
 import sys
 import math
 import pickle
@@ -26,7 +26,8 @@ def apply_multinomial_NB(C, V, prior, condprob, d):
     for c in C:
         score[c] = math.log(prior[c])
         for t in W:
-            score[c] += math.log(condprob.get((t, c), 0.4)) # if the word has never been seen use 0.4?
+            # if the word has never been seen use 0.4?
+            score[c] += math.log(condprob.get((t, c), 0.4)) 
     max_score = score[C[0]]
     max_cat = C[0]
     for k, v in score.iteritems():

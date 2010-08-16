@@ -1,5 +1,5 @@
-"""Given short snippet of text converts that text into REGULAR capitilization"""
-#"""Final Text output is not perfectly formatted around full stop and hiphen"""
+"""Given short snippet of text converts it into REGULAR capitilization"""
+
 import sys
 import math
 import pickle

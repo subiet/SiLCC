@@ -3,9 +3,9 @@ import logging
 import sys
 import csv
 
-import nltk
-from silcc.lib.util import CIList
-from optparse import OptionParser # command-line option parser                                                                                                  
+
+#command-line option parser                                                                                                  
+from optparse import OptionParser 
 from paste.deploy import appconfig
 from sqlalchemy import select, and_, create_engine, MetaData, Table
 from pylons import app_globals
@@ -26,8 +26,10 @@ class TagParser(object):
     """ Load up a DB with tags """
     def __init__(self,engine):
         self.engine = engine
-        self.tag_table = Table('tag', metadata, autoload=True, autoload_with=engine)
-        self.tag_assoc_table = Table('tag_assoc', metadata, autoload=True, autoload_with=engine)
+        self.tag_table = Table('tag', metadata, autoload=True,
+                                                        autoload_with=engine)
+        self.tag_assoc_table = Table('tag_assoc', metadata,
+                                        autoload=True, autoload_with=engine)
 
     def loaddb(self,tags):
         #Variables
@@ -46,8 +48,8 @@ class TagParser(object):
 
         #Generating Tag pairs
         for i in (range(0, (len(tags))-1)):
-            for j in range((i+1),len(tags)):
-                tup_list = [tags[i],tags[j]]
+            for j in range((i+1), len(tags)):
+                tup_list = [tags[i], tags[j]]
                 tag_list.append(tup_list)
         print "-----------------------"
         print tag_list
@@ -57,14 +59,14 @@ class TagParser(object):
         for t in tags:
             query_ = select([tag_table.c.tag], tag_table.c.tag == t)
             result = conn.execute(query_)
-            j=0
+            j = 0
             for row in result:
-                j+=1
+                j += 1
             if j == 0:
                 #Call to Google/Yahoo Results
-                #count = 1              #Dummy
-                #count = ser(t)         #Google
-                count = sery(t)         #Yahoo
+                count = 1                   #Dummy
+                #count = ser(t)             #Google
+                #count = sery(t)            #Yahoo
                 insert = tag_table.insert().values(tag = t, g_no = count)
                 conn.execute(insert)
                 #print t + " " + count
@@ -81,20 +83,23 @@ class TagParser(object):
                     )
             result = conn.execute(query_)
             
-            j=0
+            j = 0
             for row in result:
                 new_score = row[tag_assoc_table.c.score] + 1
                 assoc_id = row[tag_assoc_table.c.id]
                 j+=1          
             if j == 0:
-                s_no_ = sery(combined)
-                insert_ = tag_assoc_table.insert().values(tag_one_id = tag1_id, tag_two_id = tag2_id, score = 1, s_no = s_no_)
+                #s_no_ = sery(combined)
+                s_no_ = 1
+                insert_ = tag_assoc_table.insert().values(tag_one_id = tag1_id,
+                                tag_two_id = tag2_id, score = 1, s_no = s_no_)
                 conn.execute(insert_)
                 #print combined
                 #print s_no_
-                #print "++++++++++++++++++++++++"
+                print "++++++++++++++++++++++++"
             else:
-                update_ = tag_assoc_table.update().where(tag_assoc_table.c.id == assoc_id).values(score = new_score)
+                update_ = tag_assoc_table.update().where(tag_assoc_table.c.id
+                                        == assoc_id).values(score = new_score)
                 conn.execute(update_)
             
 if __name__ == '__main__':

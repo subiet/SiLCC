@@ -6,7 +6,8 @@ from nltk.stem.wordnet import WordNetLemmatizer
 lmtzr = WordNetLemmatizer()
 rules = (
 
-      # Specific rules for words which can't be handeled by below mentioned generic rules or the lemmetizer 
+    # Specific rules for words which can't be handeled 
+    # by below mentioned generic rules or the lemmetizer 
     (r'movies\b', 'movie'),
     (r'series\b', 'series'),
     (r'scissors\b', 'scissors'),
@@ -26,8 +27,8 @@ rules = (
     (r'radii\b', 'radius'),
     (r'(.*)ii\b', r'\1us'),
     (r'(.*)ies\b', r'\1y'),
-    (r'(.*(ch|x|o|s))es', r'\1'),             #Should take care of words like beaches etc
-    # (r'(.*?[^s])s\b', r'\1'),		      #DNS, Mars, Stars etc fix
+    (r'(.*(ch|x|o|s))es', r'\1'),  #Should take care of words like beaches etc
+    # (r'(.*?[^s])s\b', r'\1'),	   #DNS, Mars, Stars etc fix
     
   
     

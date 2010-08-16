@@ -1,4 +1,4 @@
-"""Provides the BasicTagger class which tags English language text"""
+"""BasicTagger class which tags English lang text with adjective-noun Mod"""
 import logging
 import sys
 import csv

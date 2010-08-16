@@ -123,7 +123,7 @@ class SentenceTokenizer(object):
     #('bby',)
 
     scanner = re.Scanner([
-        #Added acronym rule, will make identification accurate and normalization easier
+        #Acronym rules
         (r"\b([A-Z]\.)+[A-Z]", acronym_), 
         (r"^[A-Z][A-Z\-]+\b", first_shout_),
         (r"(?<=\.\s)([A-Z][A-Z\-]+\b)", first_shout_),
